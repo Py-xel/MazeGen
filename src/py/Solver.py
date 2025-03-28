@@ -173,7 +173,6 @@ def plot_solutions(maze, solutions):
 def solve_maze(maze):
     """Solves the maze using DFS and visualizes all unique paths."""
     solutions = dfs_find_paths(maze)
-    print(f"Number of solutions found: {len(solutions)}")  # Debug print
     if solutions:
         print(f"Found {len(solutions)} solution(s)!")
 
