@@ -32,16 +32,18 @@ class Menu:
 
     def plot_maze(self):
         while True:
-            to_plot_str = input("Would you like to better visualize the maze? [y/n]: ")
-            if (
-                to_plot_str == "y"
-                or to_plot_str == "Y"
-                or to_plot_str == "yes"
-                or to_plot_str == "YES"
-            ):
-                return "y"
-            else:
-                return "n"
+            try:
+                to_plot_str = input(
+                    "Would you like to better visualize the maze? [y/n]: "
+                )
+                if to_plot_str == "y":
+                    return "y"
+                elif to_plot_str == "n":
+                    return "n"
+                else:
+                    print("Please enter either 'n' or 'y'!")
+            except ValueError:
+                print("Invalid input. Please enter either 'n' or 'y'!")
 
     def get_maze_params(self):
         return self.maze_size, self.scarcity
@@ -52,6 +54,19 @@ class Menu:
             os.system("cls")  # Windows
         else:
             print("\033[H\033[3J", end="")  # Unix-based
+
+    def solve_maze(self):
+        while True:
+            try:
+                to_plot_str = input("Would you like to solve the maze? [y/n]: ")
+                if to_plot_str == "y":
+                    return "y"
+                elif to_plot_str == "n":
+                    return "n"
+                else:
+                    print("Please enter either 'n' or 'y'!")
+            except ValueError:
+                print("Invalid input. Please enter either 'n' or 'y'!")
 
     def visualize_maze(self, maze, build_time):
         """Clears the console and visualizes the maze."""

@@ -1,8 +1,9 @@
-from collections import deque
+from collections import (
+    deque,
+)  # Double ended queue for better stack managing | https://www.geeksforgeeks.org/deque-in-python/
 import random
 import time
-
-import sys  # Import first
+import sys
 
 sys.setrecursionlimit(10_000)  # Increase recursion limit
 
