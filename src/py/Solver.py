@@ -49,20 +49,32 @@ def dfs_find_paths(maze, max_solutions=10000):
     return paths
 
 
-def adjust_color_based_on_visits(base_color, num_visits, max_visits):
-    """Darkens the color based on the number of visits, according to the rule."""
-    # Convert the base color (52, 250, 112) to RGB
-    base_rgb = np.array([52, 250, 112])
+def adjust_color_based_on_visits(base_color, num_visits, max_visits, num_solutions):
+    """Darkens the color based on the number of visits, with a consistent gradient scaling."""
 
-    # Calculate the amount to darken the color based on num_visits
-    darken_factor = (num_visits - 1) * (
-        255 // (2 * max_visits)
-    )  # Even darkening factor
+    # If there is only one solution, return the original base color
+    if num_solutions == 1:
+        return base_color
+
+    # Convert the base color to array
+    base_rgb = np.array(base_color)
+
+    # Normalize the number of visits to a range between 0 and 1
+    normalized_visits = num_visits / max_visits
+
+    darken_factor = normalized_visits * 255  # Scale between RGB values of 0 and 255
 
     # Darken the color by subtracting the darken_factor from each RGB component
     darkened_rgb = np.maximum(
         base_rgb - darken_factor, 0
     )  # Ensure no value goes below 0
+    darkened_rgb = np.minimum(darkened_rgb, 255)  # Ensure no value goes above 255
+
+    # Set a minimum so the darkest spots aren't pitch black.
+    min_threshold = np.array([0, 100, 0])
+
+    # Ensure the darkened color does not go below the minimum threshold
+    darkened_rgb = np.maximum(darkened_rgb, min_threshold)
 
     return darkened_rgb
 
@@ -100,13 +112,10 @@ def plot_solutions(maze, solutions):
             if (x, y) != maze.start and (x, y) != maze.exit:
                 # Adjust color based on the number of times the cell is visited
                 darkened_color = adjust_color_based_on_visits(
-                    base_color=(
-                        52,
-                        250,
-                        112,
-                    ),  # Starting color (52, 250, 112) => #34FA70
+                    base_color=(52, 250, 112),  # Original color: #34FA70
                     num_visits=cell_counts[x, y],
                     max_visits=num_solutions,
+                    num_solutions=num_solutions,  # Pass number of solutions here
                 )
                 maze_array[x, y] = darkened_color  # Apply the darkened color
 
