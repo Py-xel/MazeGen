@@ -2,6 +2,10 @@ from collections import deque
 import random
 import time
 
+import sys  # Import first
+
+sys.setrecursionlimit(10_000)  # Increase recursion limit
+
 
 class Maze:
     def __init__(self, size, scarcity):
