@@ -1,5 +1,5 @@
 from Menu import Menu
-from MazeGen import Maze
+from MazeGen import MazeGen
 from Plot import _plot
 from Solver import solve_maze
 import time
@@ -10,7 +10,7 @@ def main():
 
     """ MAZE """
     maze_size, scarcity = menu.get_maze_params()
-    maze = Maze(maze_size, scarcity)
+    maze = MazeGen(maze_size, scarcity)
     build_time = maze.generate()
     menu.visualize_maze(maze, build_time)
 
@@ -22,7 +22,7 @@ def main():
     """ SOLVE """
     to_solve = menu.solve_maze()
     if to_solve == "y":
-        solve_maze(maze)
+        solve_maze(maze.get_maze())
 
 
 if __name__ == "__main__":

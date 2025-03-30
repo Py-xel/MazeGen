@@ -1,6 +1,9 @@
 from collections import (
     deque,
 )  # Double ended queue for better stack managing | https://www.geeksforgeeks.org/deque-in-python/
+from Maze import Maze
+from Coordinate import Coordinate
+from CellType import CellType
 import random
 import time
 import sys
@@ -8,7 +11,7 @@ import sys
 sys.setrecursionlimit(10_000)  # Increase recursion limit
 
 
-class Maze:
+class MazeGen:
     def __init__(self, size, scarcity):
         self.size = size
         self.scarcity = scarcity
@@ -100,6 +103,23 @@ class Maze:
                     self.visited[nx][ny] = True
 
         return False
+
+    def get_maze(self) -> Maze:
+        start = Coordinate(self.start[0], self.start[1])
+        exit = Coordinate(self.exit[0], self.exit[1])
+        layout: dict[Coordinate, CellType] = {
+            start: CellType.Start,
+            exit: CellType.Exit,
+        }
+        for i in range(self.size):
+            for j in range(self.size):
+                current_coord = Coordinate(i, j)
+                if self.grid[i][j] == "#":
+                    layout[current_coord] = CellType.Wall
+                elif self.grid[i][j] == ".":
+                    layout[current_coord] = CellType.Path
+
+        return Maze(start, exit, layout)
 
     def generate(self):
         start_time = time.time()
