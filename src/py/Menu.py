@@ -12,10 +12,12 @@ class Menu:
         while True:
             try:
                 size = int(input("Enter maze size (n): "))
-                if size > 0:
-                    return size
+                if size >= 2:  # Due to the walls, no maze under 2x2 can be generated.
+                    return (
+                        size + 2
+                    )  # We add 2 because the permanent walls reduce the maze's true size.
                 else:
-                    print("Please enter a positive integer.")
+                    print("Please enter a positive integer larger than 1.")
             except ValueError:
                 print("Invalid input. Please enter a number.")
 
