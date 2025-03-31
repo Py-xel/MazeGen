@@ -21,29 +21,31 @@ def _recursive_solve_maze(
 
 
 def _solve_maze_linear(maze: Maze) -> None:
-    maze.memory[maze.start] = 1
     for j in range(maze.size - 1):
         for i in range(maze.size):
             if j > 0 and j < maze.size - 1 and i > 0 and i < maze.size:
                 current = Coordinate(maze.size - 1 - j, i)
                 if maze.is_blockade(current) == False:
-                    upper_neighbour = current.__add__(Coordinate(0, -1))
-                    right_neighbour = current.__add__(Coordinate(1, 0))
-                    upper_value = maze.get_memory_value(upper_neighbour)
-                    right_value = maze.get_memory_value(right_neighbour)
-                    if (
-                        maze.is_blockade(upper_neighbour) == False
-                        and maze.is_blockade(right_neighbour) == False
-                    ):
-                        if upper_value != None and right_value != None:
-                            maze.memory[current] = upper_value + right_value
-                    elif maze.is_blockade(right_neighbour) == False:
-                        maze.memory[current] = right_value
-                    elif maze.is_blockade(upper_neighbour) == False:
-                        maze.memory[current] = upper_value
-                    else:
-                        maze.memory[current] = 0
+                    maze.memory[current] = _calculate_memory_value(current, maze)
     maze.memory[maze.exit] = maze.memory.get(maze.exit.__add__(Coordinate(1, 0)))
+
+
+def _calculate_memory_value(current: Coordinate, maze: Maze) -> int:
+    left_neighbour = current.__add__(Coordinate(0, -1))
+    down_neighbour = current.__add__(Coordinate(1, 0))
+    left_value = maze.get_memory_value(left_neighbour)
+    down_value = maze.get_memory_value(down_neighbour)
+    if (
+        maze.is_blockade(left_neighbour) == False
+        and maze.is_blockade(down_neighbour) == False
+    ):
+        return left_value + down_value
+    elif maze.is_blockade(down_neighbour) == False:
+        return down_value
+    elif maze.is_blockade(left_neighbour) == False:
+        return left_value
+    else:
+        return 0
 
 
 def dfs_find_paths(maze, max_solutions=10000):
@@ -90,6 +92,7 @@ def dfs_find_paths(maze, max_solutions=10000):
     dfs(start[0], start[1], [])
 
     return paths
+
 
 def solve_maze(maze: Maze):
     if maze.size < 15:

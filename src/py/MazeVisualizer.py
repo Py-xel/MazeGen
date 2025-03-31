@@ -6,9 +6,20 @@ from CellType import CellType
 
 
 class MazeVisualizer:
+
     def __init__(self, maze: Maze):
+        self.normal_form_threshold = 1000
         self.maze = maze
         pass
+
+    def _recursive_calculate_normal_form(self, num : int, pow : int = 0):
+        if 1 <= abs(num) < 10:
+            return num, pow
+        elif 0 <= abs(num) < 1:
+            return self._recursive_calculate_normal_form(num*10,pow-1)
+        elif num == 0:
+            return 0,0
+        return self._recursive_calculate_normal_form(num/10,pow+1)
 
     def _adjust_color_based_on_visits(self, base_color, num_visits, num_solutions):
         """Darkens the color based on the number of visits, with a consistent gradient scaling."""
@@ -92,14 +103,21 @@ class MazeVisualizer:
 
         # Display the number of visits for each cell in the center of each cell
         for key, value in solutions.items():
+            display_value = str(value)
+            display_size = 10
+            if value >= self.normal_form_threshold:
+                new_value , power = self._recursive_calculate_normal_form(value)
+                display_value = f"{round(new_value,2)}E{power}"
+                display_size = 5
+
             if value >= 1:
                 ax.text(
                     key.y,  # x-coordinate
                     key.x,  # y-coordinate
-                    str(value),  # Display the number of visits
+                    display_value,  # Display the number of visits
                     ha="center",
                     va="center",  # Center the text
-                    fontsize=10,
+                    fontsize=display_size,
                     color="black",
                     weight="bold",
                 )
