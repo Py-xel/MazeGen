@@ -13,15 +13,6 @@ sys.setrecursionlimit(10_000)  # Increase recursion limit
 
 class MazeService:
     def __init__(self):
-        # self.size = size
-        # self.scarcity = scarcity
-        # self.grid = [
-        #    ["#" for _ in range(size)] for _ in range(size)
-        # ]  # Walls by default
-        # self.start = (size - 1, 1)  # Shift start cell to right by one.
-        # self.exit = (0, size - 2)  # Shift exit cell to left by one.
-        # self.visited = [[False for _ in range(size)] for _ in range(size)]
-        # self._generate_maze()
         pass
 
     def _generate_maze(self, size: int, scarcity: float):
@@ -68,8 +59,6 @@ class MazeService:
         size = len(grid[0])
         for i in range(1, size - 1):  # Avoid outer walls
             for j in range(1, size - 1):  # Avoid outer walls
-                # if (i, j) == self.start or (i, j) == self.exit:
-                #    continue
                 if grid[i][j] == "#" and random.random() < scarcity:
                     grid[i][j] = "."  # Change to path if within scarcity range
 
@@ -226,11 +215,7 @@ class MazeService:
         return paths
 
     def generate(self, size: int, scarcity: float) -> Maze:
-        # start_time = time.time()
         grid = self._generate_maze(size, scarcity)
-        # end_time = time.time()
-        # build_time = round((end_time - start_time) * 1000, 2)  # Convert to milliseconds
-        # return build_time
 
         return self._create_maze_from_grid(grid)
 
@@ -239,6 +224,3 @@ class MazeService:
             self._recursive_solve_maze(maze.start, maze)
         else:
             self._solve_maze_linear(maze)
-
-        # visualizer = MazeVisualizer(maze)
-        # visualizer.plot_solutions()
