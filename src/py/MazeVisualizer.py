@@ -113,7 +113,7 @@ class MazeVisualizer:
                         solution_value = self._calculate_normal_form(solution_value)
                     print_value = self.CONSOLE_COLOURS.get(cell_value)
                     if cell_value == CellType.Exit:
-                        print_value = print_value.replace("E", solution_value)
+                        print_value = print_value.replace("E", str(solution_value))
                     print(print_value, end=" ")
                 else:
                     print(self.CONSOLE_COLOURS.get(cell_value), end=" ")
