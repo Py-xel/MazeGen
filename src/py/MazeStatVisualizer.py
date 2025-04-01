@@ -5,6 +5,6 @@ class MazeStatVisualizer:
     def __init__(self):
         pass
 
-    def plot(stat: MazeStat) -> None:
+    def plot(stats: list[MazeStat]) -> None:
         # TODO
         pass
