@@ -93,10 +93,17 @@ class MazeVisualizer:
             return 0, 0
         return self._recursive_calculate_normal_form(num / 10, pow + 1)
 
-    def _display_cell(self, grid: dict[Coordinate, CellType], current: Coordinate):
+    def _display_cell(
+        self,
+        grid: dict[Coordinate, CellType],
+        solution: dict[Coordinate, int],
+        current: Coordinate,
+    ):
         """Handles the display of individual cells with color coding."""
         if current in grid:
             cell_value = grid.get(current)
+            if len(solution) > 1 and solution.get(current) != None:
+                cell_value = solution.get(current)
             if cell_value in self.CONSOLE_COLOURS:
                 print(self.CONSOLE_COLOURS.get(cell_value), end=" ")
             else:
@@ -182,5 +189,6 @@ class MazeVisualizer:
         for x in range(maze.size):
             for y in range(maze.size):
                 current = Coordinate(x, y)
-                self._display_cell(maze.layout, current)
+                self._display_cell(maze.layout, maze.memory, current)
+
             print()  # Newline after each row

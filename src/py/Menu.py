@@ -117,12 +117,18 @@ class Menu:
         start_time = time.time()
         maze = self.controller.create_maze(maze_size, scarcity)
         end_time = time.time()
-        build_time = round((end_time - start_time) * 1000, 2)  # Convert to milliseconds
+        # Convert to milliseconds
+        build_time = round((end_time - start_time) * 1000, 2)
         self._display_maze(maze, build_time, scarcity)
 
         if self._plot_maze():
             self.visualizer.plot_maze(maze)
 
         if self._solve_maze():
+            start_time = time.time()
             self.controller.solve_maze(maze)
+            end_time = time.time()
+            # Convert to milliseconds
+            build_time = round((end_time - start_time) * 1000, 2)
+            self._display_maze(maze, build_time, scarcity)
             self.visualizer.plot_maze(maze)
