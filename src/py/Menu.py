@@ -6,6 +6,7 @@ from MazeController import MazeController
 from ValidationResult import ValidationResult
 from MazeVisualizer import MazeVisualizer
 from Maze import Maze
+from MazeStat import MazeStat
 
 
 class Menu:
@@ -61,20 +62,25 @@ class Menu:
         else:
             return ValidationResult(False, error_msg="Please enter either 'n' or 'y'!")
 
-    def _display_maze(self, maze: Maze, build_time, scarcity):
+    def _display_maze(self, maze: Maze):
         """Clears the console and visualizes the maze."""
         # Clear console
         self._clear_console()
 
         time.sleep(0.2)  # Small delay to ensure clean slate
 
+        stat = maze.stat
         # Format the stats
         maze_size_str = f"[ {maze.size} x {maze.size} ]"
-        scarcity_str = f"Scarcity: {int(scarcity * 100)}%"
-        build_time_str = f"Build time: {build_time}ms"
+        scarcity_str = f"Scarcity: {int(stat.scarcity * 100)}%"
+        build_time_str = f"Build time: {stat.build_time}ms"
+        solution_time_str = f"Solution time: {stat.solution_time}ms"
+        num_of_solutions_str = f"Number of solutions: {stat.num_solutions}"
 
         # Calculate the total length of the stats line (including spaces)
         stats_line = f"{maze_size_str}     {scarcity_str}     {build_time_str}"
+        if stat.solution_time != None:
+            stats_line += f"     {solution_time_str}     {num_of_solutions_str}"
         total_length = len(stats_line)
 
         """ FORMATTED DISPLAY """
@@ -95,11 +101,11 @@ class Menu:
         question = "Enter scarcity of walls (0.1 - 0.9): "
         return self._get_input(question, self._scarcity_validator)
 
-    def _plot_maze(self) -> bool:
+    def _is_plot_maze(self) -> bool:
         question = "Would you like to better visualize the maze? [y/n]: "
         return self._get_input(question, self._yes_no_validator)
 
-    def _solve_maze(self) -> bool:
+    def _is_solve_maze(self) -> bool:
         question = "Would you like to solve the maze? [y/n]: "
         return self._get_input(question, self._yes_no_validator)
 
@@ -110,7 +116,7 @@ class Menu:
         else:
             print("\033[H\033[3J", end="")  # Unix-based
 
-    def run(self) -> None:
+    def _create_maze(self) -> Maze:
         maze_size = self._get_maze_size()
         scarcity = self._get_scarcity()
 
@@ -119,16 +125,27 @@ class Menu:
         end_time = time.time()
         # Convert to milliseconds
         build_time = round((end_time - start_time) * 1000, 2)
-        self._display_maze(maze, build_time, scarcity)
+        maze.set_stat(MazeStat(maze_size, scarcity, build_time))
+        self.controller.update_maze(maze)
 
-        if self._plot_maze():
+        return maze
+
+    def _show_maze(self, maze: Maze) -> None:
+        self._display_maze(maze)
+        if self._is_plot_maze():
             self.visualizer.plot_maze(maze)
 
-        if self._solve_maze():
+    def _solve_maze(self, maze: Maze) -> None:
+        if self._is_solve_maze():
             start_time = time.time()
             self.controller.solve_maze(maze)
             end_time = time.time()
             # Convert to milliseconds
-            build_time = round((end_time - start_time) * 1000, 2)
-            self._display_maze(maze, build_time, scarcity)
-            self.visualizer.plot_maze(maze)
+            solution_time = round((end_time - start_time) * 1000, 2)
+            maze.update_solution_stat(solution_time)
+
+    def run(self) -> None:
+        maze = self._create_maze()
+        self._show_maze(maze)
+        self._solve_maze(maze)
+        self._show_maze(maze)

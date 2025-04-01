@@ -4,8 +4,8 @@ from collections import (
 from Maze import Maze
 from Coordinate import Coordinate
 from CellType import CellType
+from MazeRepository import MazeRepository
 import random
-import time
 import sys
 
 sys.setrecursionlimit(10_000)  # Increase recursion limit
@@ -13,6 +13,7 @@ sys.setrecursionlimit(10_000)  # Increase recursion limit
 
 class MazeService:
     def __init__(self):
+        self.repo = MazeRepository()
         pass
 
     def _generate_maze(self, size: int, scarcity: float):
@@ -224,3 +225,13 @@ class MazeService:
             self._recursive_solve_maze(maze.start, maze)
         else:
             self._solve_maze_linear(maze)
+        return maze
+
+    def save_or_update_maze(self, maze: Maze) -> Maze:
+        return self.repo.save_or_update_maze(maze)
+
+    def get_all_mazes(self) -> list[Maze]:
+        return self.repo.get_all_mazes()
+
+    def get_maze_by_id(self, id: int) -> Maze:
+        return self.repo.get_maze(id)

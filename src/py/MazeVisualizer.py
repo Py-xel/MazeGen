@@ -84,6 +84,10 @@ class MazeVisualizer:
 
         return darkened_rgb
 
+    def _calculate_normal_form(self, num: int) -> str:
+        new_value, power = self._recursive_calculate_normal_form(num)
+        return f"{round(new_value,2)}E{power}"
+
     def _recursive_calculate_normal_form(self, num: int, pow: int = 0):
         if 1 <= abs(num) < 10:
             return num, pow
@@ -102,10 +106,17 @@ class MazeVisualizer:
         """Handles the display of individual cells with color coding."""
         if current in grid:
             cell_value = grid.get(current)
-            if len(solution) > 1 and solution.get(current) != None:
-                cell_value = solution.get(current)
             if cell_value in self.CONSOLE_COLOURS:
-                print(self.CONSOLE_COLOURS.get(cell_value), end=" ")
+                if len(solution) > 1 and solution.get(current) != None:
+                    solution_value = solution.get(current)
+                    if solution_value > self.NORMAL_FORM_THRESHOLD:
+                        solution_value = self._calculate_normal_form(solution_value)
+                    print_value = self.CONSOLE_COLOURS.get(cell_value)
+                    if cell_value == CellType.Exit:
+                        print_value = print_value.replace("E", solution_value)
+                    print(print_value, end=" ")
+                else:
+                    print(self.CONSOLE_COLOURS.get(cell_value), end=" ")
             else:
                 print(cell_value, end=" ")
 
@@ -144,8 +155,7 @@ class MazeVisualizer:
                 display_value = str(value)
                 display_size = 10
                 if value >= self.NORMAL_FORM_THRESHOLD:
-                    new_value, power = self._recursive_calculate_normal_form(value)
-                    display_value = f"{round(new_value,2)}E{power}"
+                    display_value = self._calculate_normal_form(value)
                     display_size = 5
 
                 if value >= 1:
