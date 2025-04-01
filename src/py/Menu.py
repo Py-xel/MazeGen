@@ -5,14 +5,28 @@ import sys
 from MazeController import MazeController
 from ValidationResult import ValidationResult
 from MazeVisualizer import MazeVisualizer
+from MazeStatVisualizer import MazeStatVisualizer
 from Maze import Maze
 from MazeStat import MazeStat
+from FileReader import FileReader
 
 
 class Menu:
+    PATH = "../../src/data/random_mazes.csv"
+
     def __init__(self):
         self.controller = MazeController()
         self.visualizer = MazeVisualizer()
+        self.stat_visualizer = MazeStatVisualizer()
+        self.file_reader = FileReader()
+        self.selections = {
+            1: ["[1] Create a new maze: ", self._create_and_solve_selection],
+            2: ["[2] Import from file: ", self._import_maze_selection],
+            3: ["[3] Show a specific maze: ", self._display_maze_selection],
+            4: ["[4] Show stats of mazes: ", self._display_maze_stats_selection],
+            5: ["[5] Delete maze by id: ", self._delete_maze_selection],
+            6: ["[6] Exit", self._exit],
+        }
 
     def _get_input(self, question: str, validator: Callable[[str], ValidationResult]):
         while True:
@@ -33,6 +47,15 @@ class Menu:
                 return ValidationResult(
                     False, error_msg="Please enter a positive integer larger than 1."
                 )
+        except ValueError:
+            return ValidationResult(
+                False, error_msg="Invalid input. Please enter a number."
+            )
+
+    def _int_validator(self, value: str) -> ValidationResult:
+        try:
+            validated = int(value)
+            return ValidationResult(True, value=validated)
         except ValueError:
             return ValidationResult(
                 False, error_msg="Invalid input. Please enter a number."
@@ -120,13 +143,7 @@ class Menu:
         maze_size = self._get_maze_size()
         scarcity = self._get_scarcity()
 
-        start_time = time.time()
         maze = self.controller.create_maze(maze_size, scarcity)
-        end_time = time.time()
-        # Convert to milliseconds
-        build_time = round((end_time - start_time) * 1000, 2)
-        maze.set_stat(MazeStat(maze_size, scarcity, build_time))
-        self.controller.update_maze(maze)
 
         return maze
 
@@ -137,15 +154,100 @@ class Menu:
 
     def _solve_maze(self, maze: Maze) -> None:
         if self._is_solve_maze():
-            start_time = time.time()
             self.controller.solve_maze(maze)
-            end_time = time.time()
-            # Convert to milliseconds
-            solution_time = round((end_time - start_time) * 1000, 2)
-            maze.update_solution_stat(solution_time)
 
-    def run(self) -> None:
+    def _display_mazes(self, mazes: list[Maze]) -> None:
+        """Clears the console and visualizes the maze."""
+        # Clear console
+        self._clear_console()
+        time.sleep(0.2)  # Small delay to ensure clean slate
+        for maze in mazes:
+            stat = maze.stat
+            # Format the stats
+            id_str = f"ID: {maze.id}"
+            maze_size_str = f"[ {maze.size} x {maze.size} ]"
+            scarcity_str = f"Scarcity: {int(stat.scarcity * 100)}%"
+            build_time_str = f"Build time: {stat.build_time}ms"
+            solution_time_str = f"Solution time: {stat.solution_time}ms"
+            num_of_solutions_str = f"Number of solutions: {stat.num_solutions}"
+
+            # Calculate the total length of the stats line (including spaces)
+            stats_line = (
+                f"{id_str}    {maze_size_str}     {scarcity_str}     {build_time_str}"
+            )
+            if stat.solution_time != None:
+                stats_line += f"     {solution_time_str}     {num_of_solutions_str}"
+            """ FORMATTED DISPLAY """
+            print(stats_line)
+        print(f"Number of mazes: {len(mazes)}")
+
+    def _load_from_file(self) -> list[Maze]:
+        df = self.file_reader.read_from_csv(self.PATH)
+        mazes = self.controller.import_mazes(df)
+        self._display_mazes(mazes)
+        return mazes
+
+    def _select_maze_by_id(self) -> int:
+        question = "Which maze would u like to see?: "
+        return self._get_input(question, self._int_validator)
+
+    def _delete_maze_by_id(self) -> int:
+        question = "Which maze would u like to remove?: "
+        return self._get_input(question, self._int_validator)
+
+    def _display_maze_stats_selection(self) -> None:
+        mazes = self.controller.find_all_mazes()
+        stats: list[MazeStat] = list()
+        for maze in mazes:
+            if maze.stat is not None:
+                stats.append(maze.stat)
+
+        self.stat_visualizer.plot(stats)
+
+    def _display_maze_selection(self) -> None:
+        mazes = self.controller.find_all_mazes()
+        self._display_mazes(mazes)
+        id = self._select_maze_by_id()
+        if 0 <= id <= len(mazes):
+            maze = self.controller.find_maze_by_id(id)
+            if maze is not None:
+                self._show_maze(maze)
+
+    def _import_maze_selection(self) -> None:
+        mazes = self._load_from_file()
+        id = self._select_maze_by_id()
+        if 0 <= id <= len(mazes):
+            maze = self.controller.find_maze_by_id(id)
+            if maze is not None:
+                self._show_maze(maze)
+
+    def _create_and_solve_selection(self) -> None:
         maze = self._create_maze()
         self._show_maze(maze)
         self._solve_maze(maze)
         self._show_maze(maze)
+
+    def _delete_maze_selection(self) -> None:
+        mazes = self.controller.find_all_mazes()
+        self._display_mazes(mazes)
+        id = self._delete_maze_by_id()
+        if 0 <= id <= len(mazes):
+            maze = self.controller.remove_maze_by_id(id)
+            if maze is not None:
+                self._show_maze(maze)
+
+    def _exit(self) -> None:
+        exit
+
+    def run(self) -> None:
+        while True:
+            self._clear_console()
+            for value in self.selections.values():
+                print(f"{value[0]}")
+
+            answer = int(input())
+            if answer in self.selections:
+                self.selections.get(answer)[1]()
+            if answer == 6:
+                break
+        exit

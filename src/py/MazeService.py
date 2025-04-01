@@ -5,18 +5,27 @@ from Maze import Maze
 from Coordinate import Coordinate
 from CellType import CellType
 from MazeRepository import MazeRepository
+from MazeStat import MazeStat
 import random
 import sys
+import pandas as pd
+import time
+
 
 sys.setrecursionlimit(10_000)  # Increase recursion limit
 
 
 class MazeService:
+    SIZE_THRESHOLD = 15
+    WALL_EXTEND_VALUE = 2
+
     def __init__(self):
         self.repo = MazeRepository()
         pass
 
     def _generate_maze(self, size: int, scarcity: float):
+        num_of_tries = 20 - (scarcity * 10)
+        counter = 0
         """Generates the maze and ensures it is solvable."""
         while True:
             # Reset the grid and visited cells
@@ -34,6 +43,10 @@ class MazeService:
             # Check if the maze is solvable with only right or up movements
             if self._is_solvable(start, exit, grid):
                 break  # Exit if solvable
+            if counter < num_of_tries:
+                counter += 1
+            else:
+                break
             print("Maze is unsolvable, regenerating...")
         return grid
 
@@ -216,12 +229,12 @@ class MazeService:
         return paths
 
     def generate(self, size: int, scarcity: float) -> Maze:
-        grid = self._generate_maze(size, scarcity)
-
-        return self._create_maze_from_grid(grid)
+        if size - self.WALL_EXTEND_VALUE >= 2 and 0.1 <= scarcity <= 0.9:
+            grid = self._generate_maze(size, scarcity)
+            return self._create_maze_from_grid(grid)
 
     def solve_maze(self, maze: Maze):
-        if maze.size < 15:
+        if maze.size < self.SIZE_THRESHOLD:
             self._recursive_solve_maze(maze.start, maze)
         else:
             self._solve_maze_linear(maze)
@@ -235,3 +248,6 @@ class MazeService:
 
     def get_maze_by_id(self, id: int) -> Maze:
         return self.repo.get_maze(id)
+
+    def remove_maze_by_id(self, id: int) -> None:
+        self.repo.remove_maze(id)
