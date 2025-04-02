@@ -48,6 +48,7 @@ class MazeService:
             if counter < num_of_tries:
                 counter += 1
             else:
+                grid.clear()
                 break
             # Animated loading text
             sys.stdout.write(f"\rGenerating solutions, please wait {next(spinner)} ")
@@ -167,24 +168,25 @@ class MazeService:
         return (0, size - 2)
 
     def _create_maze_from_grid(self, grid) -> Maze:
-        size = len(grid[0])
-        start_pos = self._get_start_pos(grid)
-        exit_pos = self._get_exit_pos(grid)
-        start = Coordinate(start_pos[0], start_pos[1])
-        exit = Coordinate(exit_pos[0], exit_pos[1])
-        layout: dict[Coordinate, CellType] = {
-            start: CellType.Start,
-            exit: CellType.Exit,
-        }
-        for i in range(size):
-            for j in range(size):
-                current_coord = Coordinate(i, j)
-                if grid[i][j] == "#":
-                    layout[current_coord] = CellType.Wall
-                elif grid[i][j] == ".":
-                    layout[current_coord] = CellType.Path
+        if len(grid) > 0:
+            size = len(grid[0])
+            start_pos = self._get_start_pos(grid)
+            exit_pos = self._get_exit_pos(grid)
+            start = Coordinate(start_pos[0], start_pos[1])
+            exit = Coordinate(exit_pos[0], exit_pos[1])
+            layout: dict[Coordinate, CellType] = {
+                start: CellType.Start,
+                exit: CellType.Exit,
+            }
+            for i in range(size):
+                for j in range(size):
+                    current_coord = Coordinate(i, j)
+                    if grid[i][j] == "#":
+                        layout[current_coord] = CellType.Wall
+                    elif grid[i][j] == ".":
+                        layout[current_coord] = CellType.Path
 
-        return Maze(start, exit, layout)
+            return Maze(start, exit, layout)
 
     def dfs_find_paths(self, maze, max_solutions=10000):
         """Uses DFS (Depth-First Search) to find paths from start to exit, moving only UP or RIGHT.

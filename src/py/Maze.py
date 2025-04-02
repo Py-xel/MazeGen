@@ -28,7 +28,9 @@ class Maze:
             return 0
 
     def update_solution_stat(self, time: float) -> None:
-        self.stat.set_num_solutions(self.memory.get(self.exit))
+        exit_value = self.memory.get(self.exit)
+        solution_value = exit_value if exit_value != None else 0
+        self.stat.set_num_solutions(solution_value)
         self.stat.set_solution_time(time)
 
     def set_stat(self, stat: MazeStat) -> None:

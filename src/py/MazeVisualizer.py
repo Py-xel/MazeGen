@@ -154,21 +154,22 @@ class MazeVisualizer:
             for key, value in maze.memory.items():
                 display_value = str(value)
                 display_size = 10
-                if value >= self.NORMAL_FORM_THRESHOLD:
-                    display_value = self._calculate_normal_form(value)
-                    display_size = 5
+                if value is not None:
+                    if value >= self.NORMAL_FORM_THRESHOLD:
+                        display_value = self._calculate_normal_form(value)
+                        display_size = 5
 
-                if value >= 1:
-                    ax.text(
-                        key.y,  # x-coordinate
-                        key.x,  # y-coordinate
-                        display_value,  # Display the number of visits
-                        ha="center",
-                        va="center",  # Center the text
-                        fontsize=display_size,
-                        color="black",
-                        weight="bold",
-                    )
+                    if value >= 1:
+                        ax.text(
+                            key.y,  # x-coordinate
+                            key.x,  # y-coordinate
+                            display_value,  # Display the number of visits
+                            ha="center",
+                            va="center",  # Center the text
+                            fontsize=display_size,
+                            color="black",
+                            weight="bold",
+                        )
 
         # GRID LINES
         # Shift the grid by 0.5 units left and up
