@@ -94,7 +94,7 @@ class Menu:
 
         stat = maze.stat
         # Format the stats
-        maze_size_str = f"[ {maze.size} x {maze.size} ]"
+        maze_size_str = f"[ {maze.size - 2} x {maze.size - 2} ]"
         scarcity_str = f"Scarcity: {int(stat.scarcity * 100)}%"
         build_time_str = f"Build time: {stat.build_time}ms"
         solution_time_str = f"Solution time: {stat.solution_time}ms"
@@ -165,7 +165,7 @@ class Menu:
             stat = maze.stat
             # Format the stats
             id_str = f"ID: {maze.id}"
-            maze_size_str = f"[ {maze.size} x {maze.size} ]"
+            maze_size_str = f"[ {maze.size - 2} x {maze.size - 2} ]"
             scarcity_str = f"Scarcity: {int(stat.scarcity * 100)}%"
             build_time_str = f"Build time: {stat.build_time}ms"
             solution_time_str = f"Solution time: {stat.solution_time}ms"
