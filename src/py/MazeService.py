@@ -8,6 +8,7 @@ from MazeRepository import MazeRepository
 from MazeStat import MazeStat
 import random
 import sys
+import itertools  # Used for loading animation
 import pandas as pd
 import time
 
@@ -26,6 +27,7 @@ class MazeService:
     def _generate_maze(self, size: int, scarcity: float):
         num_of_tries = 20 - (scarcity * 10)
         counter = 0
+        spinner = itertools.cycle(["-", "\\", "|", "/"])  # Spinner animation
         """Generates the maze and ensures it is solvable."""
         while True:
             # Reset the grid and visited cells
@@ -47,7 +49,10 @@ class MazeService:
                 counter += 1
             else:
                 break
-            print("Maze is unsolvable, regenerating...")
+            # Animated loading text
+            sys.stdout.write(f"\rGenerating solutions, please wait {next(spinner)} ")
+            sys.stdout.flush()
+            time.sleep(0.1)  # Short delay for animation
         return grid
 
     def _recursive_backtrack(self, grid, visited, size, x, y):

@@ -20,11 +20,11 @@ class Menu:
         self.stat_visualizer = MazeStatVisualizer()
         self.file_reader = FileReader()
         self.selections = {
-            1: ["[1] Create a new maze: ", self._create_and_solve_selection],
-            2: ["[2] Import from file: ", self._import_maze_selection],
-            3: ["[3] Show a specific maze: ", self._display_maze_selection],
-            4: ["[4] Show stats of mazes: ", self._display_maze_stats_selection],
-            5: ["[5] Delete maze by id: ", self._delete_maze_selection],
+            1: ["[1] Create a new maze", self._create_and_solve_selection],
+            2: ["[2] Import from file", self._import_maze_selection],
+            3: ["[3] Show a specific maze", self._display_maze_selection],
+            4: ["[4] Show stats of mazes", self._display_maze_stats_selection],
+            5: ["[5] Delete maze by id", self._delete_maze_selection],
             6: ["[6] Exit", self._exit],
         }
 
@@ -188,11 +188,11 @@ class Menu:
         return mazes
 
     def _select_maze_by_id(self) -> int:
-        question = "Which maze would u like to see?: "
+        question = "Which maze would you like to see?: "
         return self._get_input(question, self._int_validator)
 
     def _delete_maze_by_id(self) -> int:
-        question = "Which maze would u like to remove?: "
+        question = "Which maze would you like to remove?: "
         return self._get_input(question, self._int_validator)
 
     def _display_maze_stats_selection(self) -> None:
@@ -244,6 +244,9 @@ class Menu:
             self._clear_console()
             for value in self.selections.values():
                 print(f"{value[0]}")
+
+            print("-" * 30)  # Dashed line separator
+            print("")  # Empty line after menu
 
             answer = int(input())
             if answer in self.selections:
